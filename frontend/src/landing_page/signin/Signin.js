@@ -1,28 +1,29 @@
 import * as React from 'react';
+import { useState } from "react";
+import { useNavigate, Link } from 'react-router-dom';
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
 
 const defaultTheme = createTheme();
 
-function Login() {
+export default function Signin() {
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState({
     email: "",
     password: "",
+    username: "",
   });
-  const { email, password } = inputValue;
+  const { email, password, username } = inputValue;
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -39,18 +40,19 @@ function Login() {
 
   const handleSuccess = (msg) =>
     toast.success(msg, {
-      position: "bottom-left",
+      position: "bottom-right",
     });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:4000/login",
-        inputValue,
+        "http://localhost:4000/signup",
+        {
+          ...inputValue,
+        },
         { withCredentials: true }
       );
-      console.log(data);
       const { success, message } = data;
       if (success) {
         handleSuccess(message);
@@ -62,16 +64,19 @@ function Login() {
       }
     } catch (error) {
       console.log(error);
-      handleError("An error occurred.");
+      handleError("An error occurred while signing up.");
     }
+    // Optionally clear form state after submission
     setInputValue({
       email: "",
       password: "",
+      username: "",
     });
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
+      <ToastContainer />
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -80,8 +85,7 @@ function Login() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage:
-              'url("media/images/background.jpg")',
+            backgroundImage: 'url("media/images/background.jpg")',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
             backgroundSize: 'cover',
@@ -102,7 +106,7 @@ function Login() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign In
+              Sign up
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
@@ -111,11 +115,22 @@ function Login() {
                 fullWidth
                 id="email"
                 label="Email Address"
-                value={email}
                 name="email"
+                value={email}
                 onChange={handleOnChange}
                 autoComplete="email"
                 autoFocus
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="username"
+                label="Username"
+                name="username"
+                value={username}
+                autoComplete="username"
+                onChange={handleOnChange}
               />
               <TextField
                 margin="normal"
@@ -135,15 +150,15 @@ function Login() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Sign In
+                Sign Up
               </Button>
               <Grid container>
                 <Grid item xs>
                 </Grid>
                 <Grid item>
                   <span>
-                    Don't have an account? 
-                    <Link to="/signin" style={{ textDecoration: 'none' }}> Sign up</Link>
+                    Already have an account?
+                    <Link to="/signup" style={{ textDecoration: 'none' }}> Sign in</Link>
                   </span>
                 </Grid>
               </Grid>
@@ -151,9 +166,6 @@ function Login() {
           </Box>
         </Grid>
       </Grid>
-      <ToastContainer />
     </ThemeProvider>
   );
 }
-
-export default Login;

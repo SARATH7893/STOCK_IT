@@ -21,7 +21,7 @@ function Team() {
         </div>
         <div className="col-6 p-3">
           <p>
-            Sarath Bootstrapped And Founded StockIt In 2010 To Overcome The
+            Sarath Bootstrapped And Founded StockIt In 2024 To Overcome The
             Hurdles He Faced During His Decade Long Stint As A Trader. Today,
             StockIt Has Changed The Landscape Of The Indian Broking Industry.
           </p>
