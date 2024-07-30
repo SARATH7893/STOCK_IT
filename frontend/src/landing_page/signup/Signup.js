@@ -42,33 +42,43 @@ function Login() {
       position: "bottom-left",
     });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios.post(
-        "http://localhost:4000/login",
-        inputValue,
-        { withCredentials: true }
-      );
-      console.log(data);
-      const { success, message } = data;
-      if (success) {
-        handleSuccess(message);
-        setTimeout(() => {
-          navigate("/");
-        }, 1000);
-      } else {
-        handleError(message);
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+    
+      try {
+        const response = await axios.post(
+          "http://localhost:3002/login",
+          inputValue,
+          { withCredentials: true }
+        );
+    
+        if (response.status === 200) { 
+          const { data } = response;
+          const { success, message } = data;
+          if (success) {
+            console.log(data); 
+            console.log("user created account successfully");
+            handleSuccess(message);
+            setTimeout(() => {
+              navigate("/signin");
+            }, 1000);
+          } else {
+            handleError(message);
+          }
+        } else {
+          console.error("Login request failed:", response.status);
+          handleError("An error occurred during login.");
+        }
+      } catch (error) {
+        console.error("Error occurred:", error);
+        handleError("An error occurred.");
+      } finally {
+        setInputValue({
+          email: "",
+          password: "",
+        });
       }
-    } catch (error) {
-      console.log(error);
-      handleError("An error occurred.");
-    }
-    setInputValue({
-      email: "",
-      password: "",
-    });
-  };
+    };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -81,7 +91,7 @@ function Login() {
           md={7}
           sx={{
             backgroundImage:
-              'url("media/images/background.jpg")',
+              'url("media/images/background2.jpg")',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
             backgroundSize: 'cover',
