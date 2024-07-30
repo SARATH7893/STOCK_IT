@@ -12,7 +12,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import {  toast } from "react-toastify";
 
 const defaultTheme = createTheme();
 
@@ -44,40 +44,30 @@ function Login() {
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-    
       try {
-        const response = await axios.post(
+        console.log("Submitting form with values:", inputValue);
+        const { data } = await axios.post(
           "http://localhost:3002/login",
           inputValue,
           { withCredentials: true }
         );
-    
-        if (response.status === 200) { 
-          const { data } = response;
-          const { success, message } = data;
-          if (success) {
-            console.log(data); 
-            console.log("user created account successfully");
-            handleSuccess(message);
-            setTimeout(() => {
-              navigate("/signin");
-            }, 1000);
-          } else {
-            handleError(message);
-          }
+        console.log("Received response:", data);
+        const { success, message } = data;
+        if (success) {
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
         } else {
-          console.error("Login request failed:", response.status);
-          handleError("An error occurred during login.");
+          handleError(message);
         }
       } catch (error) {
-        console.error("Error occurred:", error);
+        console.log("Error occurred:", error);
         handleError("An error occurred.");
-      } finally {
-        setInputValue({
-          email: "",
-          password: "",
-        });
       }
+      setInputValue({
+        email: "",
+        password: "",
+      });
     };
 
   return (
@@ -161,7 +151,7 @@ function Login() {
           </Box>
         </Grid>
       </Grid>
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </ThemeProvider>
   );
 }
