@@ -2,7 +2,6 @@ import * as React from 'react';
 import { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import axios from "axios";
-import {  toast } from "react-toastify";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,6 +12,8 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const defaultTheme = createTheme();
 
@@ -23,6 +24,10 @@ export default function Signin() {
     password: "",
     username: "",
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('info');
+
   const { email, password, username } = inputValue;
 
   const handleOnChange = (e) => {
@@ -33,18 +38,21 @@ export default function Signin() {
     });
   };
 
-  const handleError = (err) =>
-    toast.error(err, {
-      position: "bottom-left",
-    });
-
-  const handleSuccess = (msg) =>
-    toast.success(msg, {
-      position: "bottom-right",
-    });
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting form with values:", inputValue);
+
+    if (!email || !password || !username) {
+      setSnackbarMessage('Please fill in all fields.');
+      setSnackbarSeverity('warning');
+      setSnackbarOpen(true);
+      return;
+    }
+
     try {
       const { data } = await axios.post(
         "http://localhost:3002/signup",
@@ -55,18 +63,24 @@ export default function Signin() {
       );
       const { success, message } = data;
       if (success) {
-        handleSuccess(message);
+        setSnackbarMessage(message);
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
         setTimeout(() => {
-          navigate("/");
+          navigate("/signup");
         }, 1000);
       } else {
-        handleError(message);
+        setSnackbarMessage(message);
+        setSnackbarSeverity('warning');
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.log(error);
-      handleError("An error occurred while signing up.");
+      setSnackbarMessage("An error occurred while signing up.");
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
-    // Optionally clear form state after submission
+
     setInputValue({
       email: "",
       password: "",
@@ -76,7 +90,6 @@ export default function Signin() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      {/* <ToastContainer /> */}
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -96,10 +109,11 @@ export default function Signin() {
           <Box
             sx={{
               my: 8,
-              mx: 4,
+              mx: 'auto',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              maxWidth: 450,
             }}
           >
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
@@ -108,7 +122,7 @@ export default function Signin() {
             <Typography component="h1" variant="h5">
               Sign up
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
               <TextField
                 margin="normal"
                 required
@@ -157,7 +171,7 @@ export default function Signin() {
                 </Grid>
                 <Grid item>
                   <span>
-                    Already have an account?
+                    Already have an account? 
                     <Link to="/signup" style={{ textDecoration: 'none' }}> Sign in</Link>
                   </span>
                 </Grid>
@@ -166,6 +180,22 @@ export default function Signin() {
           </Box>
         </Grid>
       </Grid>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
+        action={
+          <Button color="inherit" onClick={handleSnackbarClose}>
+            Close
+          </Button>
+        }
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }

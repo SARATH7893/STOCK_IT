@@ -6,13 +6,15 @@ import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography'; 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {  toast } from "react-toastify";
 
 const defaultTheme = createTheme();
 
@@ -24,6 +26,11 @@ function Login() {
   });
   const { email, password } = inputValue;
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+  const [loading, setLoading] = useState(false); 
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setInputValue({
@@ -32,43 +39,54 @@ function Login() {
     });
   };
 
-  const handleError = (err) =>
-    toast.error(err, {
-      position: "bottom-left",
-    });
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
-  const handleSuccess = (msg) =>
-    toast.success(msg, {
-      position: "bottom-left",
-    });
+  const showSnackbar = (message, severity) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        console.log("Submitting form with values:", inputValue);
-        const { data } = await axios.post(
-          "http://localhost:3002/login",
-          inputValue,
-          { withCredentials: true }
-        );
-        console.log("Received response:", data);
-        const { success, message } = data;
-        if (success) {
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
-        } else {
-          handleError(message);
-        }
-      } catch (error) {
-        console.log("Error occurred:", error);
-        handleError("An error occurred.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    console.log("Form values:", inputValue);
+    
+    if (!email || !password) {
+      showSnackbar("Please enter both email and password.", "warning");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data } = await axios.post(
+        "http://localhost:3002/login",
+        inputValue,
+        { withCredentials: true }
+      );
+      console.log("Received response:", data); 
+      const { success, message } = data;
+      if (success) {
+        showSnackbar("Login successful! Redirecting...", "success");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else {
+        showSnackbar(message, "warning");
       }
+    } catch (error) {
+      console.error("Error occurred:", error); 
+      showSnackbar("An error occurred. Please try again.", "error");
+    } finally {
+      setLoading(false); 
       setInputValue({
         email: "",
         password: "",
       });
-    };
+    }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -80,8 +98,7 @@ function Login() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage:
-              'url("media/images/background2.jpg")',
+            backgroundImage: 'url("media/images/background2.jpg")',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
             backgroundSize: 'cover',
@@ -148,10 +165,34 @@ function Login() {
                 </Grid>
               </Grid>
             </Box>
+            {loading && (
+              <Box sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <CircularProgress />
+              </Box>
+            )}
           </Box>
         </Grid>
       </Grid>
-      {/* <ToastContainer /> */}
+
+      {}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} 
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 }
