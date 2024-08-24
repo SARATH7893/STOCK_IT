@@ -1,6 +1,13 @@
 import React from "react";
 
 const Summary = () => {
+
+window.addEventListener('load', () => {
+  const email = localStorage.getItem('userEmail');
+  console.log('Email from localStorage:', email);
+  localStorage.removeItem('userEmail');
+});
+
   return (
     <>
       <div className="username">
