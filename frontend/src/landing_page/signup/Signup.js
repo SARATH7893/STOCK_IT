@@ -67,11 +67,13 @@ function Login() {
         { withCredentials: true }
       );
       console.log("Received response:", data); 
+
       const { success, message } = data;
       if (success) {
+        localStorage.setItem('userEmail', email);
         showSnackbar("Login successful! Redirecting...", "success");
         setTimeout(() => {
-          navigate("/");
+          window.location.href="http://localhost:3001"
         }, 1000);
       } else {
         showSnackbar(message, "warning");
