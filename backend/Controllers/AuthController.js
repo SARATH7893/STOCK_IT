@@ -49,3 +49,14 @@ module.exports.Login = async (req, res, next) => {
     console.error(error);
   }
 }
+
+module.exports.setData=async (req,res)=>{
+    const email=req.body;
+    localStorage.setItem=('email',JSON.stringify(email));
+    res.send("data saved succesfully in local storage");
+}
+
+module.exports.getData=async (req,res)=>{
+  const email=localStorage.getItem('email');
+  res.send(JSON.parse(email));
+}
