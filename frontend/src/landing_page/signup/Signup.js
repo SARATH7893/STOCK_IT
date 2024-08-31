@@ -72,11 +72,8 @@ function Login() {
       if (success) {
         localStorage.setItem('userEmail', email);
         showSnackbar("Login successful! Redirecting...", "success");
-        axios.post('http://localhost:3002/setdata',{
-          email
-        })
         setTimeout(() => {
-          window.location.href="http://localhost:3000"
+          window.location.href="http://localhost:3001"
         }, 1000);
       } else {
         showSnackbar(message, "warning");

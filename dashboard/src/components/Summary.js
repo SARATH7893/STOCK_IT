@@ -1,27 +1,11 @@
 import React from "react";
-import axios from "axios";
-import { useState,useEffect } from "react";
+
 const Summary = () => {
-
-  const [recievedData,setRecievedData]=useState("");
-
-
-  useEffect(()=>{
-    const fetchData=async ()=>{
-      try{
-        const response=axios.get("http://localhost:3002/getdata");
-        setRecievedData(response.data);
-      }catch(error){
-        console.error(error);
-      }
-    }
-    fetchData();
-  },[])
 
   return (
     <>
       <div className="username">
-        <h6>Hi, User! {recievedData}</h6>
+        <h6>Hi, User! </h6>
         <hr className="divider" />
       </div>
 
