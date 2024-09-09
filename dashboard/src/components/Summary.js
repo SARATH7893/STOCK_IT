@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const Summary = () => {
+
+  const[email,setEmail]=useState(localStorage.getItem('email')||'')
+  const [searchParams] = useSearchParams();
+  
+  useEffect(()=>{
+    const queryEmail=searchParams.get('email');
+    if(queryEmail){
+      setEmail(queryEmail);
+      localStorage.setItem('email',queryEmail);
+    }
+  },[searchParams])
 
   return (
     <>
       <div className="username">
-        <h6>Hi, User! </h6>
+        <h6>Hi,{email}</h6>
         <hr className="divider" />
       </div>
 

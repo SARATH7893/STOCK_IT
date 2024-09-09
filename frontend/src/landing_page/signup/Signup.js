@@ -73,7 +73,7 @@ function Login() {
         localStorage.setItem('userEmail', email);
         showSnackbar("Login successful! Redirecting...", "success");
         setTimeout(() => {
-          window.location.href="http://localhost:3001"
+          window.location.href=`http://localhost:3001?email=${email}`
         }, 1000);
       } else {
         showSnackbar(message, "warning");

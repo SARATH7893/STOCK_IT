@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const { OrdersSchema } = require("../schemas/OrdersSchema");
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -19,6 +20,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: new Date(),
   },
+  orders:[OrdersSchema]
 });
 
 userSchema.pre("save", async function () {
